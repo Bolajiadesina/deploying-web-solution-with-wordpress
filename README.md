@@ -19,13 +19,13 @@ This project aims to implement a web solution using WordPress on Ubuntu servers 
 ### Step 1 - Launch and Configure EC2 Instances:
 Configure Security group to allow inbound traffic on ports 22 (SSH) and 80 (HTTP) for the web server, and port 3306 (MySQL) for the database server.
 
-![Webserver-sg](Images/web-server-sg.png)
+![Webserver-sg](images/web-server-sg.png)
 
-![Database-sg](Images/config-sg.png)
+![Database-sg](images/config-sg.png)
 
 Create and launch two Ubuntu EC2 instances
 
-![Instances-Created](Images/instances.png)
+![Instances-Created](images/instances.png)
 
 
 ### Step 2 - Create and Attach EBS Volumes:
@@ -34,20 +34,20 @@ In the AWS Management Console, create three EBS volumes of 10 GiB each in the sa
 
 Attach these volumes to the web server instance.
 
-![Volumes-Created](Images/volumes.png)
+![Volumes-Created](images/volumes.png)
 
 ### Step 3 - Verify EBS Volume Attachment (Web Server):
 
 Connect to the web server instance
-![Volumes attached succefully](Images/attach-vol1.png)
-![Volumes attached succefully](Images/attach-vol2.png)
+![Volumes attached succefully](images/attach-vol1.png)
+![Volumes attached succefully](images/attach-vol2.png)
 
 Use the command below to list all block devices and verify that the attached volumes (nvme1n1, nvme2n1, nvme3n1) are present.
 
 ```
 lsblk
 ```
-![Volumes attached succefully](Images/confirm-vol.png)
+![Volumes attached succefully](images/confirm-vol.png)
 
 ### Step 4 - Partition EBS Volumes (Web Server):
 
@@ -67,7 +67,7 @@ sudo gdisk /dev/xvdbh
 
 Follow the interactive prompts to create partitions for each EBS volume, ensuring sufficient space for Wordpress installation.
 
-![Partitions-created](Images/partition.png)
+![Partitions-created](images/partition.png)
 
 
 
@@ -77,7 +77,7 @@ Verify the partitions
 ```
 lsblk
 ```
-![partitions verified](Images/confirm-part.png)
+![partitions verified](images/confirm-part.png)
 
 ### Step 5 - Install LVM Package (Web Server):
 
@@ -90,7 +90,7 @@ sudo apt update
 
 sudo apt install lvm2 -y
 ```
-![LVM-install](Images/inst-lvm2.png)
+![LVM-install](images/inst-lvm2.png)
 
 ### Step 6 - Check Available Partitions (Web Server):
 
@@ -99,7 +99,7 @@ Use the command below to list all available physical partitions for LVM manageme
 ```
 sudo lvmdiskscan
 ```
-![Check Available Partitions](Images/confirm-lvnm.png)
+![Check Available Partitions](images/confirm-lvnm.png)
 
 ### Step 7 - Create Physical Volumes (Web Server):
 
@@ -115,7 +115,7 @@ Verify the physical volumes by running the comand below. which will list all ava
 sudo pvs
 ```
 
-![Create Physical Volumes](Images/sudo-pvs.png)
+![Create Physical Volumes](images/sudo-pvs.png)
 
 ### Step 8 - Create Volume Group (Web Server):
 
@@ -125,7 +125,7 @@ Use the `sudo vgcreate` command to create a volume group (VG) named webdata-vg t
 sudo vgcreate webdata-vg /dev/xvdbf1 /dev/xvdbg1 /dev/xvdbh1
 
 ```
-![Create Volume Group](Images/vgcreate1.png)
+![Create Volume Group](images/vgcreate1.png)
 
 Verify the volume group created using:
 
@@ -133,7 +133,7 @@ Verify the volume group created using:
 sudo vgs
 ```
 
-![Create Volume Group](Images/vgcreate2.png)
+![Create Volume Group](images/vgcreate2.png)
 
 ### Step 9 -  Create Logical Volumes (Web Server):
 
@@ -155,7 +155,7 @@ Verify the Logical Volumes created by listing all logical volumes using:
 ```
 sudo lvs
 ```
-![Create and verify logical volumes](Images/logical-volumes.png)
+![Create and verify logical volumes](images/logical-volumes.png)
 
 ### Step 10 - Format Logical Volumes (Web Server):
 
@@ -167,7 +167,7 @@ sudo mkfs.ext4 /dev/webdata-vg/apps-lv
 ```
 sudo mkfs.ext4 /dev/webdata-vg/logs-lv
 ```
-![Format Logical Volumes](Images/format-logical-volumes.png)
+![Format Logical Volumes](images/format-logical-volumes.png)
 
 ### Step 11 - Create Mount Points and Mount Logical Volumes (Web Server):
 
@@ -195,7 +195,7 @@ Use rsync to back up existing log files from `/var/log` to a secure location lik
 ```
 sudo rsync -av /var/log/. /home/recovery/logs/
 ```
-![Logs-backup](Images/check-mount.png)
+![Logs-backup](images/check-mount.png)
 
 Once done, mount /var/log on logs-lv logical volume
 ```
@@ -208,7 +208,7 @@ Now restore the previously backed-up logs from `/home/recovery/logs` back to `/v
 sudo rsync -av /home/recovery/logs/. /var/log
 
 ```
-![Logs-mount-and-restore](Images/restore-backup.png)
+![Logs-mount-and-restore](images/restore-backup.png)
 
 ### Step 12 - Update fstab File (Web Server):
 
@@ -225,7 +225,7 @@ Add entries for the logical volumes, replacing UUID with your device UUID.
 sudo nano /etc/fstab
 ```
 
-![fstab-edit](Images/add-config.png)
+![fstab-edit](images/add-config.png)
 
 Save and close the fastab file
 
@@ -249,8 +249,8 @@ Repeat steps 2-12 i.e (creating and attaching EBS volumes, partitioning, LVM con
 
 - There's no need to create a separate volume for logs on the database server.
 
-![Database Server Setup](Images/db-lv.png)
-![Database Server Setup](Images/db-workd.png)
+![Database Server Setup](images/db-lv.png)
+![Database Server Setup](images/db-workd.png)
 
 ### Step 14 - Install and Configure MySQL (Database Server):
 
@@ -265,7 +265,7 @@ Install MySQL server:
 ```
 sudo apt install mysql-server -y
 ```
-![Database Server Setup](Images/instal-mysql.png)
+![Database Server Setup](images/instal-mysql.png)
 
 Start and enable the MySQL service:
 
@@ -279,7 +279,7 @@ Check mysql status
 ```
 sudo systemctl status mysql
 ```
-![MySQL-status](Images/start-mysql.png)
+![MySQL-status](images/start-mysql.png)
 
 It’s recommended that you run a security script that comes pre-installed with MySQL. This script will remove some insecure default settings and lock down access to your database system.
 
@@ -301,7 +301,7 @@ After making this change, exit the MySQL prompt:
 exit
 ```
 
-![MySQL-password](Images/sql-workd.png)
+![MySQL-password](images/sql-workd.png)
 
 Start the interactive script by running:
 
@@ -371,7 +371,7 @@ Find the line bind-address = 127.0.0.1 and either comment it out or replace it w
 
 Save and close the file.
 
-![MySQL-bind-address](Images/bind-addres.png)
+![MySQL-bind-address](images/bind-addres.png)
 
 Restart mysql with
 ```
@@ -395,7 +395,7 @@ sudo mysql -h <database_server_ip> -u wordpress -p
 
 If the connection is successful, you'll be prompted for the password and see the MySQL prompt. This confirms that the web server can communicate with the database server.
 
-![webserver-connect-to-Database-server-MySQL](Images/sql-workd.png)
+![webserver-connect-to-Database-server-MySQL](images/sql-workd.png)
 
 Exit the MySQL shell if you connected for testing:
 
@@ -470,7 +470,7 @@ Download the latest WordPress tarball:
 ```
 sudo wget http://wordpress.org/latest.tar.gz
 ```
-![Wordpress-install](Images/wordprescli.png)
+![Wordpress-install](images/wordprescli.png)
 
 Extract the downloaded archive:
 
@@ -489,7 +489,7 @@ sudo rm -rf latest.tar.gz
 ```
 sudo cp wordpress/wp-config-sample.php wordpress/wp-config.php
 ```
-![alt text](Images/wp-config.png)
+![alt text](images/wp-config.png)
 
 - Copy the entire WordPress directory structure to the web server's document root (/var/www/html):
 
@@ -515,7 +515,7 @@ sudo systemctl restart apache2
 
 - Use the MySQL username `(wordpress)` and password you created earlier to log in to the WordPress admin panel and complete the setup process.
 
-![wordpress](Images/lastpage.png)
+![wordpress](images/lastpage.png)
 
 
 ### Conclusion:
