@@ -515,7 +515,7 @@ sudo systemctl restart apache2
 
 - Use the MySQL username `(wordpress)` and password you created earlier to log in to the WordPress admin panel and complete the setup process.
 
-![wordpress](images/lastpage.png)
+![wordpress](images/homepage.png)
 
 
 ### Conclusion:
